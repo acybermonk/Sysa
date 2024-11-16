@@ -197,12 +197,12 @@ Uninstall
                                 New-Item -Path "$StartDirPath\Files" -ItemType File -Name "systems.s" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
                                 New-Item -Path "$StartDirPath\Files" -ItemType File -Name "users.u" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
                                 New-Item -Path "$StartDirPath\Files" -ItemType File -Name "combo.cb" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
-                                New-Item -Path "$StartDirPath\Files" -ItemType File -Name "comboAndGroup.cmb" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
+                                New-Item -Path "$StartDirPath\Files" -ItemType File -Name "comboAndGroup.cbg" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
                             }else{
                                 New-Item -Path "$StartDirPath\Files" -ItemType File -Name "systems.s" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
                                 New-Item -Path "$StartDirPath\Files" -ItemType File -Name "users.u" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
                                 New-Item -Path "$StartDirPath\Files" -ItemType File -Name "combo.cb" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
-                                New-Item -Path "$StartDirPath\Files" -ItemType File -Name "comboAndGroup.cmb" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
+                                New-Item -Path "$StartDirPath\Files" -ItemType File -Name "comboAndGroup.cbg" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
                             }
                         # Display Completion
                             $DriveSelectionMessage_Label.Text = "*Process Complete*"
@@ -2186,12 +2186,12 @@ Uninstall
                                         New-Item -Path "$StartDirPath\Files" -ItemType File -Name "systems.s" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
                                         New-Item -Path "$StartDirPath\Files" -ItemType File -Name "users.u" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
                                         New-Item -Path "$StartDirPath\Files" -ItemType File -Name "combo.cb" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
-                                        New-Item -Path "$StartDirPath\Files" -ItemType File -Name "comboAndGroup.cmb" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
+                                        New-Item -Path "$StartDirPath\Files" -ItemType File -Name "comboAndGroup.cbg" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
                                     }else{
                                         New-Item -Path "$StartDirPath\Files" -ItemType File -Name "systems.s" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
                                         New-Item -Path "$StartDirPath\Files" -ItemType File -Name "users.u" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
                                         New-Item -Path "$StartDirPath\Files" -ItemType File -Name "combo.cb" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
-                                        New-Item -Path "$StartDirPath\Files" -ItemType File -Name "comboAndGroup.cmb" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
+                                        New-Item -Path "$StartDirPath\Files" -ItemType File -Name "comboAndGroup.cbg" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
                                     }
                                 # Display Completion
                                     $DriveSelectionMessage_Label.Text = "*Process Complete*"

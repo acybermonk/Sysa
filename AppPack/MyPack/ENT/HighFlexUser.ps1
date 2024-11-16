@@ -1,9 +1,6 @@
 ###############################################################################################
-###############################################################################################
-###############################################################################################
-
-
 # Description  : High Flex User Script
+###############################################################################################
 # Single
 
 # *(required)
@@ -77,10 +74,10 @@ Write-Host ""
     function runScript{
         # Choose Type
         function chooseType{
-            Write-Host "[HF, THF, IHF]" # SHPW ABREVIATION OPTIONS
+            #Write-Host "[HF, THF]" # SHPW ABREVIATION OPTIONS
             $Global:SelectedGroup = Read-Host "Selection "
-            $Global:SelectedGroup = $Global:SelectedGroup.ToUpper()
-            $Global:MembershipGroup = ""
+            #$Global:SelectedGroup = $Global:SelectedGroup.ToUpper()
+            #$Global:MembershipGroup = ""
         }
         # Check Selection
         function checkSelection{
@@ -114,11 +111,11 @@ Write-Host ""
         }
 
         chooseType
-        checkSelection
+        #checkSelection
 
         if ($actionType -eq "Check"){
             $Found = $false
-            Write-Host "Attempting to check if $userName is a member of $Global:MembershipGroup group"
+            Write-Host "Attempting to check if $userName is a member of $Global:SelectedGroup group"
             # Try and get system group list
                 try{
                     $list = (Get-ADUser $userName -Properties MemberOf).MemberOf | Get-ADGroup | Select-Object Name | Sort-Object Name 
@@ -136,7 +133,7 @@ Write-Host ""
                 foreach ($member in $list){
                     # If found
                     # CHECK FOR ALIKE BASE NAME
-                    if ($member -like "*TIAvecto*"){
+                    if ($member -like "*$SelectedGroup*"){
                         $member = $member.Name
                         Write-Host "    $userName is apart of $member" -ForegroundColor Green
                         $Found = $true
@@ -150,10 +147,10 @@ Write-Host ""
                 }
             }
         }elseif ($actionType -eq "Remove"){
-            Write-Host "Attempting to remove $Global:MembershipGroup from $userName"
+            Write-Host "Attempting to remove $Global:SelectedGroup from $userName"
             # Try to get Group obj
                 try{
-                    $GroupDist = Get-ADGroup -Identity $Global:MembershipGroup -Properties DistinguishedName | Select-Object -ExpandProperty DistinguishedName
+                    $GroupDist = Get-ADGroup -Identity $Global:SelectedGroup -Properties DistinguishedName | Select-Object -ExpandProperty DistinguishedName
                 }catch{
                     localLogWrite "ERR: Failed to get DistGroup of group"
                 }
@@ -166,17 +163,17 @@ Write-Host ""
             # Try to remove group from user
                 try{
                     Remove-ADGroupMember -Identity $GroupDist -Members $UserDist -Confirm:$false
-                    Write-Host "    Removed $userName from $Global:MembershipGroup" -ForegroundColor Green 
+                    Write-Host "    Removed $userName from $Global:SelectedGroup" -ForegroundColor Green 
                 }catch{
                     Write-Host "    ERR: Failed to complete. No Actions taken" -ForegroundColor Red
-                    $Global:ReturnErrMessage = "Failed to add $userName to $Global:MembershipGroup Group"
+                    $Global:ReturnErrMessage = "Failed to add $userName to $Global:SelectedGroup Group"
                     localLogWrite "ERR: Failed to remove $Global:Type from AD Group"
                 }
         }elseif ($actionType -eq "Add"){
-            Write-Host "Attempting to add $Global:MembershipGroup to $userName"
+            Write-Host "Attempting to add $Global:SelectedGroup to $userName"
             # Try to get Group obj
                 try{
-                    $GroupDist = Get-ADGroup -Identity $Global:MembershipGroup -Properties DistinguishedName | Select-Object -ExpandProperty DistinguishedName
+                    $GroupDist = Get-ADGroup -Identity $Global:SelectedGroup -Properties DistinguishedName | Select-Object -ExpandProperty DistinguishedName
                 }catch{
                     localLogWrite "ERR: Failed to get DistGroup of group"
                 }
@@ -189,10 +186,10 @@ Write-Host ""
             # Try to add group to user
                 try{
                     Add-ADGroupMember -Identity $GroupDist -Members $UserDist -Confirm:$false
-                    Write-Host "    Added $userName to $Global:MembershipGroup" -ForegroundColor Green 
+                    Write-Host "    Added $userName to $Global:SelectedGroup" -ForegroundColor Green 
                 }catch{
                     Write-Host "    ERR: Adding $group group Failed" -ForegroundColor Red
-                    $Global:ReturnErrMessage = "Failed to add $userName to $Global:MembershipGroup Group"
+                    $Global:ReturnErrMessage = "Failed to add $userName to $Global:SelectedGroup Group"
                     localLogWrite "ERR: Failed to add $Global:Type to AD Group"
                 }
         }else{

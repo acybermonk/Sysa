@@ -1,9 +1,6 @@
 ###############################################################################################
-###############################################################################################
-###############################################################################################
-
-
 # Description  : High Flex User Script
+###############################################################################################
 # Single
 
 # *(required)
@@ -76,7 +73,6 @@ Write-Host ""
     function runScript{
         function checkIt{
             $Found = $false
-            Write-Host "Attempting to check if $systemName is a member of $Global:MembershipGroup group"
             # Try and get system group list
             try{
                 $list = (Get-ADComputer $systemName –Properties MemberOf).MemberOf | Get-ADGroup | Select-Object name | Sort-Object Name
@@ -90,18 +86,25 @@ Write-Host ""
                 $Global:ReturnErrMessage = "Unable to get list of $Global:Type`'s AD Groups"
                 localLogWrite "ERR: Unable to get list of $Global:Type AD Groups"
             }else{
+            Write-Host "Attempting to check if $systemName is a member of $Global:MembershipGroup group"
                 # Check each member for groups
                 foreach ($member in $list){
                     # If found
-                    if ($member -like "*NoPatchRestriction*"){
+                    foreach ($checkGroup in $Global:Groups){
                         $member = $member.Name
-                        Write-Host -ForegroundColor Green "$systemName is apart of $member"
-                        $Found = $true
-                    }elseif($member -like "*Windows10_Legacy*"){
+                        if ($member -like "*$checkGroup*"){
+                            #$member = $member.Name
+                            Write-Host -ForegroundColor Green "$systemName is apart of $member"
+                            $Found = $true
+                        }
+                    }
+                    <#
+                    elseif($member -like "*Windows10_Legacy*"){
                         $member = $member.Name
                         Write-Host -ForegroundColor Green "$systemName is apart of $member"
                         $Found = $true
                     }
+                    #>
                 }
                 # If not found
                 if (!$Found){

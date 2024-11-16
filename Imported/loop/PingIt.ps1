@@ -14,17 +14,17 @@ param ([string]$SubScriptPath,[string]$GroupFile_SelectedFilePath,[string]$FileN
     Write-Host "GroupFile Name   : $FileName"
     Write-Host "Process          : $Process"
     Write-Host "LoopOption       : $loopOption"
-    Pause
+    #Pause
 
 # Set strict Mode
 Set-StrictMode -Version Latest
 
 function TestPath{
     # Test Path Permissions
-    if (Test-Path -Path $Global:Path){
+    if (Test-Path -Path $Global:HomeAppPath){
         $Global:pathCheck = $true
-        LocalLogWrite "        Path :: $Global:Path :: $Global:pathCheck"
-        Set-Location -Path $Global:Path
+        LocalLogWrite "        Path :: $Global:HomeAppPath :: $Global:pathCheck"
+        Set-Location -Path $Global:HomeAppPath
         Write-Output("       Path Set:   True")
     }
 }
@@ -54,7 +54,12 @@ function GetDateNow{
 
 function LocalLogWrite{
     Param ([string]$logString)
-    Add-Content $Global:localLog -Value $logString
+    if (Test-Path "$Global:LogPath"){
+        Add-Content $Global:localLog -Value $logString
+    }else{
+        New-Item -Path $Global:LogPathBase -Name "PingIt" -ItemType Directory -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
+        Add-Content $Global:localLog -Value $logString
+    }
 }
 
 function DisplayHeader{
@@ -157,12 +162,12 @@ function doIt{
             Pause
             Exit
     }
-    Pause
+    #Pause
 <#&&&#>
 
     if ($Global:DataList.length -ge 1){
-        Write-Host "GE 1"
-        Pause
+        #Write-Host "GE 1"
+        #Pause
         try{
             $Global:dataCount = $Global:DataList.Count
         }catch{
@@ -178,8 +183,8 @@ function doIt{
         }
         #>
     }else{
-        Write-Host "LT 1"
-        Pause
+        #Write-Host "LT 1"
+        #Pause
         if ($Global:initRun){
             Write-Output("**NO DATA**")
             LocalLogWrite "**NO DATA**"
@@ -309,8 +314,11 @@ function doIt{
 
 # Specify variables
 $Drive = [System.Environment]::GetEnvironmentVariable('SysaDrive','User')
-$Global:Path = "$Drive\Sysa"
-$Global:localLog = "$Global:Path\Imported\loop\PingIt\PingAutoLog.log"
+$Global:HomeAppPath = "$Drive\Sysa"
+$Global:LogPathBase = "$Global:HomeAppPath\Imported\loop"
+$Global:LogPath = "$Global:LogPathBase\PingIt"
+$Global:LogName = "PingAutoLog.log"
+$Global:localLog = "$Global:LogPath\$Global:LogName"
 [System.Collections.ArrayList]$Global:found = @()
 $removeCount = 0
 $Global:tryCount = 288 # 24hrs
@@ -337,11 +345,11 @@ LocalLogWrite "*========================================*"
 
 # Show Header
 DisplayHeader
-Pause
+#Pause
 # Start Main Functions
 if ($Global:pathCheck -and $Global:access){
-    Write-Host "In Do it"
-    Pause
+    #Write-Host "In Do it"
+    #Pause
     doIt
 }elseif($Global:access){
     Write-Error -Message "ACCESS DENIED: user does not have permissions to access path." -Category PermissionDenied
