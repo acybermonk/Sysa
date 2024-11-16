@@ -73,6 +73,7 @@ Write-Host ""
     function runScript{
         function checkIt{
             $Found = $false
+            Write-Host "Attempting to check if $systemName memberships"
             # Try and get system group list
             try{
                 $list = (Get-ADComputer $systemName –Properties MemberOf).MemberOf | Get-ADGroup | Select-Object name | Sort-Object Name
@@ -86,16 +87,18 @@ Write-Host ""
                 $Global:ReturnErrMessage = "Unable to get list of $Global:Type`'s AD Groups"
                 localLogWrite "ERR: Unable to get list of $Global:Type AD Groups"
             }else{
-            Write-Host "Attempting to check if $systemName is a member of $Global:MembershipGroup group"
                 # Check each member for groups
-                foreach ($member in $list){
-                    # If found
-                    foreach ($checkGroup in $Global:Groups){
+                foreach ($checkGroup in $Global:Groups){
+                    $checkGroup = $checkGroup.ToString()
+                    Write-Host "Attempting to check if $systemName is a member of $checkGroup group"
+                    foreach ($member in $list){
                         $member = $member.Name
+                        # If found
                         if ($member -like "*$checkGroup*"){
-                            #$member = $member.Name
-                            Write-Host -ForegroundColor Green "$systemName is apart of $member"
+                            Write-Host -ForegroundColor Green "$systemName is apart of $checkGroup"
                             $Found = $true
+                        }else{
+                            Write-Host -ForegroundColor Red "$systemName is not apart of of $checkGroup"
                         }
                     }
                     <#
@@ -116,7 +119,7 @@ Write-Host ""
         }
         function RemoveIt{
             foreach ($group in $Global:Groups){
-                Write-Host "Attempting to remove ${systemName} from ${group}"
+                Write-Host "Attempting to remove $systemName from $group"
                 # Try to get group obj
                     try{
                         $GroupDist = Get-ADGroup -Identity $group -Properties DistinguishedName | Select-Object -ExpandProperty DistinguishedName
@@ -143,7 +146,7 @@ Write-Host ""
         }
         function AddIt{
             #Write-Host "ADD SYSTEM TO AD GROUP"
-            Write-Host "Attempting to add ${systemName} to ${addGroup}"
+            Write-Host "Attempting to add $systemName to $addGroup"
                 # Try to get group obj
                     try{
                         $GroupDist = Get-ADGroup -Identity $addGroup -Properties DistinguishedName | Select-Object -ExpandProperty DistinguishedName

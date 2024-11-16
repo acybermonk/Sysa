@@ -115,7 +115,7 @@ Write-Host ""
 
         if ($actionType -eq "Check"){
             $Found = $false
-            Write-Host "Attempting to check if $userName is a member of $Global:SelectedGroup group"
+            Write-Host "Attempting to check if $userName memberships"
             # Try and get system group list
                 try{
                     $list = (Get-ADUser $userName -Properties MemberOf).MemberOf | Get-ADGroup | Select-Object Name | Sort-Object Name 
@@ -129,6 +129,7 @@ Write-Host ""
                 $Global:ReturnErrMessage = "Unable to get list of $userName`'s AD Groups"
                 localLogWrite "ERR: Unable to get list of $Global:Type AD Groups"
             }else{
+                Write-Host "Attempting to check if $userName is a member of $Global:SelectedGroup group"
                 # Check each member for groups
                 foreach ($member in $list){
                     # If found
