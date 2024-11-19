@@ -49,7 +49,7 @@ Param ([string] $FoundDrive)
         $d = $d.ToString()
 	    if (Test-Path "$d`:\Sysa\Imported\img"){
             $Global:ImgIcon = New-Object System.Drawing.Icon("$d`:\Sysa\Imported\img\logo64.ico")
-            $Global:LogImage = [System.Drawing.Image]::FromFile("$d`:\Sysa\Imported\img\logimg.png")
+            #$Global:LogImage = [System.Drawing.Image]::FromFile("$d`:\Sysa\Imported\img\logimg.png")
             break
 	    }
 	}

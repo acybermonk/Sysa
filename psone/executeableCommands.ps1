@@ -49,8 +49,9 @@ Write-Host "`n----------------------------------------`n------------------------
 # Create Path
     $Drive = "C:"
     $HomePath = "$Drive\$appName"
+    Write-Host $HomePath
 # Icon
-    $icoFilePath = "$HomePath\Imported\img\logo64.ico"
+    $icoFilePath = "$HomePath\Imported\img\logo32.ico"
 # Get Compile List for Executables 
     $CompileExeList = Get-ChildItem -Path "$HomePath\psone" -Exclude "executeableCommands.ps1","psone.in" -Force | Select-Object -Property FullName,Name,Basename
 
@@ -60,5 +61,6 @@ foreach ($file in $CompileExeList){
     $FileBaseName = $file.Basename
     $FileName = $file.Name
     $FilePath = $file.FullName
-    Invoke-ps2exe -inputFile $FilePath -outputFile “$HomePath\$FileBaseName.exe" -noConsole -title "Sysa" -version "2.2" -iconFile $icoFilePath
+    Write-Host $FilePath
+    Invoke-ps2exe -inputFile $FilePath -outputFile “$HomePath\$FileBaseName`.exe" -noConsole -title "Sysa" -version "2.2" -iconFile $icoFilePath -x64 -copyright "October 2024" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
 }

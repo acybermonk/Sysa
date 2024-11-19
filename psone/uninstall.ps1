@@ -120,6 +120,8 @@ if ($unistConfirm -eq "OK"){
     # Set Global: Variables to null
         utilLog "===== Removing all variables for SysaDrive"
         utilLog "  * Starting  to set variables to null"
+        $Global:ImgIcon =
+        $Global:LogImage =
 	    $Global:AppName = 
 	    $Global:AppVer = 
         $Global:Copyright = 
