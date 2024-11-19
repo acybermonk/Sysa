@@ -79,7 +79,7 @@ if ($unistConfirm -eq "OK"){
                     # Remove Shortcuts
                     $localBackupPath = "$d`:\Sysa\Sysa"
                     utilLog "    - Cheching for backup Shortcut link"
-                    if (Test-Path $localBackupPath){
+                    if ((Test-Path "$localBackupPath") -eq $true -or (Test-Path "$localBackupPath`.lnk") -eq $true){
                         utilLog "      > Removing local backup shortcut"
                         try{
                             Remove-Item -Path $localBackupPath -Force -Confirm:$false
@@ -254,7 +254,7 @@ if ($unistConfirm -eq "OK"){
         # Desktop
         utilLog "===== Cheching for Desktop shortcut link"
         $LnkPath = "$env:HOMEDRIVE$env:HOMEPATH\Desktop\Sysa"
-        if (Test-Path $LnkPath){
+        if ((Test-Path "$LnkPath") -eq $true -or (Test-Path "$LnkPath`.lnk") -eq $true){
             utilLog "  * Removing Desktop shortcut"
             Remove-Item -Path $LnkPath -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
             if (-not (Test-Path $LnkPath)){
