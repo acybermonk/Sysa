@@ -1,6 +1,7 @@
 ﻿# Run to compile new executabes for Sysa : the admin utility
 # Must have ps2exe module installed
 
+
 # Check for ps2exe Module
 $CurrModules = Get-Module -Name ps2exe | Select-Object -ExpandProperty Name
 Write-Host "----------------------------------------" -ForegroundColor Yellow

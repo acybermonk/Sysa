@@ -241,12 +241,12 @@ Uninstall
                             New-Item -Path "$StartDirPath\Files" -ItemType File -Name "systems.s" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
                             New-Item -Path "$StartDirPath\Files" -ItemType File -Name "users.u" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
                             New-Item -Path "$StartDirPath\Files" -ItemType File -Name "combo.cb" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
-                            New-Item -Path "$StartDirPath\Files" -ItemType File -Name "comboAndGroup.cmb" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
+                            New-Item -Path "$StartDirPath\Files" -ItemType File -Name "comboAndGroup.cbg" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
                         }else{
                             New-Item -Path "$StartDirPath\Files" -ItemType File -Name "systems.s" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
                             New-Item -Path "$StartDirPath\Files" -ItemType File -Name "users.u" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
                             New-Item -Path "$StartDirPath\Files" -ItemType File -Name "combo.cb" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
-                            New-Item -Path "$StartDirPath\Files" -ItemType File -Name "comboAndGroup.cmb" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
+                            New-Item -Path "$StartDirPath\Files" -ItemType File -Name "comboAndGroup.cbg" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
                         }
                     # Display Completion
                         $DriveSelectionMessage_Label.Text = "*Process Complete*"
@@ -1162,7 +1162,7 @@ Uninstall
                 $t = 1
 				# To turn on/off session Mode 
 				if ($Global:SessionMode){
-				    [string]$sessionPath = "$Global:StartPath\Sysalogs\sessionlog\${Global:LogDate}_mysysa.slog"
+				    [string]$sessionPath = "$Global:StartPath\Sysalogs\sessionlog\${Global:LogDate}_sysa.slog"
 					if (Test-Path "Gloabal:StartPath\Sysalogs"){
 						if (Test-Path "$Global:StartPath\Sysalogs\sessionlog"){
 							Add-Content -Path $sessionPath -Value $DisplayLog_RichTextBox.Text 
@@ -1615,9 +1615,9 @@ Uninstall
                     $Global:GroupFileFormat = $null
                     $Global:GroupFile_Selected = $GroupFileSelection_ComboBox.SelectedItem
                     $Global:GroupFile_SelectedPath = "$Global:StartPath\Files\$Global:GroupFile_Selected"
-                    if (-not ([string]::IsNullOrEmpty($Global:GroupFile_SelectedPath))){
-                        if (-not([string]::IsNullOrWhiteSpace($Global:GroupFile_SelectedPath))){
-                            if (-not ($Global:GroupFile_SelectedPath -eq "")){
+                    if (-not ([string]::IsNullOrEmpty($Global:GroupFile_Selected))){
+                        if (-not([string]::IsNullOrWhiteSpace($Global:GroupFile_Selected))){
+                            if (-not ($Global:GroupFile_Selected -eq "")){
                                 # Test Path
                                 LocalLogWrite "Testing Path  : $Global:GroupFile_SelectedPath"
                                 LocalLogWrite "*---------------------------------*"
@@ -1644,6 +1644,7 @@ Uninstall
                                     $GroupFileSelection_ComboBox.Text = ""
                                     $GroupFileSelection_Label.Text = $MyFile.Name
                                     $Global:Imported = $true
+                                    $GroupFileImport_Button.Text = "Clear"
                                 }else{
                                     LocalLogWrite "Path : Invalid"
                                     LocalLogWrite "*---------------------------------*"
@@ -1651,6 +1652,7 @@ Uninstall
                             }else{
                                 if ($Global:Imported){
                                     LocalLogWrite "Clearing Imported File"
+                                    LocalLogWrite "*---------------------------------*"
                                     $Global:MyFile = $null
                                     $Extension =$null
                                     $Global:GroupFile_RunType = $null
@@ -1663,6 +1665,7 @@ Uninstall
                                     $GroupFileSelection_Label.Text = "<File Selected>"
                                     $GroupFileFormat_Label.Text = "<Format>"
                                     $Global:Imported = $false
+                                    $GroupFileImport_Button.Text = "Import"
                                 }else{
                                     LocalLogWrite "GroupFile is invalid"
                                     LocalLogWrite "*---------------------------------*"
@@ -1671,6 +1674,7 @@ Uninstall
                         }else{
                             if ($Global:Imported){
                                 LocalLogWrite "Clearing Imported File"
+                                LocalLogWrite "*---------------------------------*"
                                 $Global:MyFile = $null
                                 $Extension =$null
                                 $Global:GroupFile_RunType = $null
@@ -1683,6 +1687,7 @@ Uninstall
                                 $GroupFileSelection_Label.Text = "<File Selected>"
                                 $GroupFileFormat_Label.Text = "<Format>"
                                 $Global:Imported = $false
+                                $GroupFileImport_Button.Text = "Import"
                             }else{
                                 LocalLogWrite "GroupFile is invalid"
                                 LocalLogWrite "*---------------------------------*"
@@ -1692,6 +1697,7 @@ Uninstall
                         if ($Global:Imported){
                             if ($GroupFileFormat_Label.Text -ne "<Format>"){
                                 LocalLogWrite "Clearing Imported File"
+                                LocalLogWrite "*---------------------------------*"
                                 $Global:MyFile = $null
                                 $Extension =$null
                                 $Global:GroupFile_RunType = $null
@@ -1704,6 +1710,7 @@ Uninstall
                                 $GroupFileSelection_Label.Text = "<File Selected>"
                                 $GroupFileFormat_Label.Text = "<Format>"
                                 $Global:Imported = $false
+                                $GroupFileImport_Button.Text = "Import"
                             }
                         }else{
                             LocalLogWrite "GroupFile is invalid"
@@ -1806,7 +1813,7 @@ Uninstall
                     $PreReq_FileImported = $false
                     $PreReq_LoopCheck = $false
                     # PreReqs
-                    if ($Global:GroupFile_SelectedPath -ne $null -and $Global:GroupFile_SelectedPath -ne ""){
+                    if ($Global:GroupFile_Selected -ne $null -and $Global:GroupFile_Selected -ne ""){
                         if (Test-Path -Path "$Global:GroupFile_SelectedPath"){
                             #LocalLogWrite "File Path is valid"
                             $PreReq_FileImported = $true
@@ -1861,7 +1868,7 @@ Uninstall
                         if ($PreReq_Script -eq $true){
                             # Pass PreReq
                             LocalLogWrite "Passed System PreReq"
-                            LocalLogWrite "File Path : $Global:GroupFile_SelectedPath"
+                            LocalLogWrite "File : $Global:GroupFile_Selected"
                             LocalLogWrite "Format        : $Global:GroupFileFormat"
                             $SubScriptPath = "$Global:AppPackPath\GroupPack\$GroupScript_Selected`.ps1"
                             $FileExt = $Global:MyFile.Extension
@@ -2231,12 +2238,12 @@ Uninstall
                                 New-Item -Path "$StartDirPath\Files" -ItemType File -Name "systems.s" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
                                 New-Item -Path "$StartDirPath\Files" -ItemType File -Name "users.u" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
                                 New-Item -Path "$StartDirPath\Files" -ItemType File -Name "combo.cb" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
-                                New-Item -Path "$StartDirPath\Files" -ItemType File -Name "comboAndGroup.cmb" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
+                                New-Item -Path "$StartDirPath\Files" -ItemType File -Name "comboAndGroup.cbg" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
                             }else{
                                 New-Item -Path "$StartDirPath\Files" -ItemType File -Name "systems.s" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
                                 New-Item -Path "$StartDirPath\Files" -ItemType File -Name "users.u" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
                                 New-Item -Path "$StartDirPath\Files" -ItemType File -Name "combo.cb" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
-                                New-Item -Path "$StartDirPath\Files" -ItemType File -Name "comboAndGroup.cmb" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
+                                New-Item -Path "$StartDirPath\Files" -ItemType File -Name "comboAndGroup.cbg" -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
                             }
                         # Display Completion
                             $DriveSelectionMessage_Label.Text = "*Process Complete*"

@@ -31,6 +31,7 @@
         Param ([string]$LogString)
         Add-Content "$logpathdir\$logFile" -Value $LogString
     }
+    [bool]$err = $false
 $unistConfirm = [Windows.Forms.MessageBox]::Show("Starting Uninstall for all SysaDrives, Files, Logs, and Loaded Packs?`nLog Found at '$logpathdir\$logFile' ","Sysa - Uninstall",[System.Windows.Forms.FormBorderStyle]::FixedSingle)
 if ($unistConfirm -eq "OK"){
     # Start Log
@@ -56,6 +57,7 @@ if ($unistConfirm -eq "OK"){
                         }catch{
                             utilLog "      > Failed unloading Pack"
                             Write-Error -Message "Failed unloading Pack"
+                            $err = $true
 
                         }
                         # Try to prep pack
@@ -67,6 +69,7 @@ if ($unistConfirm -eq "OK"){
                             }catch{
                                 utilLog "      > Failed prepping Pack"
                                 Write-Error -Message "Failed prepping Pack"
+                                $err = $true
                             }
                         }
                     }else{
@@ -84,7 +87,7 @@ if ($unistConfirm -eq "OK"){
                         }catch{
                             utilLog "        >> Failed removing local backup shortcut"
                             Write-Error -Message "Failed removing local backup shortcut"
-
+                            $err = $true
                         }
                     }else{
                         utilLog "    > No local backup shortcut found"
@@ -103,12 +106,14 @@ if ($unistConfirm -eq "OK"){
             }else{
                 utilLog "      > Failed removing SysaDrive"
                 Write-Error -Message "Failed removing SysaDrive"
+                $err = $true
             }
         }else{
             utilLog "  * No SysaDrive found"
             if ($Found -eq $false){
                 utilLog "    - No SysaDrive Options"
                 [Windows.Forms.MessageBox]::Show("No SysaDrive. No Packs.","Error") | Out-Null
+                $err = $true
             }
         }
 
@@ -230,7 +235,7 @@ if ($unistConfirm -eq "OK"){
         if (-not ($process -eq $null)){
             utilLog "  * Found open Sysa App"
             Get-Process -ProcessName Sysa | Stop-Process -Force -Confirm:$false
-            #Start-Sleep -Seconds 1
+            Start-Sleep -Seconds 2
             function checkForOpen{
                 $process = Get-Process -ProcessName Sysa -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
                 if ($process -eq $null){
@@ -238,6 +243,7 @@ if ($unistConfirm -eq "OK"){
                 }else{
                     utilLog "    - Failed closing open utility"
                     Write-Error -Message "Failed closing open utility"
+                    $err = $true
                 }
             }
             checkForOpen
@@ -256,6 +262,7 @@ if ($unistConfirm -eq "OK"){
             }else{
                 utilLog "    - Failed removing Desktop shortcut"
                 Write-Error -Message "Failed at removong logfile"
+                $err = $true
             }
         }else{
             utilLog " * No Desktop shortcut found"
@@ -269,6 +276,7 @@ if ($unistConfirm -eq "OK"){
                 utilLog "    - Successfully removed Files directory"
             }else{
                 utilLog "    - Failed removing Files directory"
+                $err = $true
             }
         }else{
             utilLog "  * No Files directory found"
@@ -288,6 +296,7 @@ if ($unistConfirm -eq "OK"){
                 }else{
                     utilLog "      > Failed removing $logname"
                     Write-Error -Message "Failed removing $logname"
+                    $err = $true
                 }
             }
         }else{
@@ -297,5 +306,9 @@ if ($unistConfirm -eq "OK"){
         utilLog "##### Uninstall - Utility Completed #####"
         utilLog "-----------------------------------------"
     # Notify Complete
-    $completeNotify = [Windows.Forms.MessageBox]::Show("Uninstall is complete","Sysa - Uninstall",[System.Windows.Forms.MessageBoxButtons]::OK)
+    if ($err){
+        $completeNotify = [Windows.Forms.MessageBox]::Show("Uninstall completed with errors. Check lo; -- ($logpathdir\$logFile)","Sysa - Uninstall",[System.Windows.Forms.MessageBoxButtons]::OK)
+    }else{
+        $completeNotify = [Windows.Forms.MessageBox]::Show("Uninstall completed","Sysa - Uninstall",[System.Windows.Forms.MessageBoxButtons]::OK)
+    }
 }
