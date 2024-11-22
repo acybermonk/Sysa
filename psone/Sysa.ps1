@@ -713,115 +713,182 @@ Uninstall
 
             # Run Drop Down List
             $RunMenuItem_ImportMyPack = New-Object System.Windows.Forms.ToolStripMenuItem("Import MyPack")
+            $RunMenuItem_ImportMyPack.Enabled = $false
             $RunMenuItem_ImportMyPack.Add_Click({
+                $info = $null
                 $Global:MyPackPath = "$Global:AppPackPath\MyPack"
-                $Global:MyPack_Packs = Get-ChildItem $Global:MyPackPath -Directory -Exclude "Pack" | select -ExpandProperty Name 
                 if (Test-Path "$Global:MyPackPath\Pack\MyPack.in"){
                     # Check Imported
-
-                    #$Global:MyPack = Get-Content -Path "$Global:MyPackPath\Pack\MyPack.in"
-                    # Import MyPack Confirmation Form
-
-                        ##############################################
-                        ##############################################
-
-                            $ImportMyPackConfirmation_Form = New-Object $Form_Object
-                            $ImportMyPackConfirmation_Form.Text = "MyPack - Import"
-                            $ImportMyPackConfirmation_Form.ClientSize = New-Object System.Drawing.Point(250,125)
-	                        $ImportMyPackConfirmation_Form.FormBorderStyle = "Fixed3D" #FixedDialog, Fixed3D
-	                        $ImportMyPackConfirmation_Form.StartPosition = [Windows.Forms.FormStartPosition]::CenterScreen
-	                        $ImportMyPackConfirmation_Form.Icon = $Global:imgIcon
-                            $ImportMyPackConfirmation_Form.Add_FormClosing({
-                                $ImportMyPackConfirmation_Form.Dispose()
-                            })
-
-                            $ImportMyPackConfirmation_Label = New-Object $Label_Object
-                            $ImportMyPackConfirmation_Label.Text = "Do you want to import`n${Global:MyPack}?"
-                            $ImportMyPackConfirmation_Label.Font = New-Object System.Drawing.Font("Calibri",11)
-                            $ImportMyPackConfirmation_Label.TextAlign = "MiddleCenter"
-                            $ImportMyPackConfirmation_Label.Size = New-Object System.Drawing.Point(250,80)
-                            $ImportMyPackConfirmation_Label.Location = New-Object System.Drawing.Point(0,0)
-
-                            $ImportMyPackConfirmationConfirm_Button = New-Object $Button_Object
-                            $ImportMyPackConfirmationConfirm_Button.Text = "Yes"
-                            $ImportMyPackConfirmationConfirm_Button.Font = New-Object System.Drawing.Font("Calibri",11)
-                            $ImportMyPackConfirmationConfirm_Button.Size = New-Object System.Drawing.Point(80,25)
-                            $ImportMyPackConfirmationConfirm_Button.Location = New-Object System.Drawing.Point(20,80)
-                            $ImportMyPackConfirmationConfirm_Button.Add_Click({
-                                # Clear all ScriptS
-                                $ScriptSelect_Combobox.Items.Clear()
-                                # Import AppPack
-				                $Global:ScriptSelect = Get-ChildItem -Path "$Global:AppPackPath\Single" -File | Select -Property BaseName,Name,Extension
-				                if ($Global:ScriptSelect -eq $null){
-					                $Global:ErrorCodeVal += "204;"
-					                ExitLogWrite
-					                #LocalLogWrite "Failed to load Single Option Scripts"
-				                }else{
-				                    $Global:ScriptSelectCount = $Global:ScriptSelect.Count
-                                    if ($Global:ScriptSelectCount -eq $null){
-                                        $Global:ScriptSelectCount = 1
-                                    }
-				                    for ($i = 0; $i -lt $Global:ScriptSelectCount; $i++){
-					                    if ($Global:ScriptSelect[$i].Name -ne "AppPack.in"){
-                                            if ($Global:ScriptSelect[$i].Name -ne "README.txt"){
-						                        $FileName = $Global:ScriptSelect[$i].BaseName
-						                        $ScriptSelect_Combobox.Items.Add($FileName) | Out-Null
-					                        }
+                        $info = Get-Content -Path "$Global:MyPackPath\Pack\MyPack.in" -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+                            # Shorten the MyPack info if over $foundIndex
+                                $foundIndex = 100
+                                if ($info.Length -gt $foundIndex){
+                                    #$foundIndex = $foundIndex - 1 
+                                        $tempName = $info.Substring(0,($foundIndex-1))
+                                        $checkSpace = $info.Substring($foundIndex,1)
+                                        if ($checkSpace -eq " " -or $checkSpace -eq "" -or $checkSpace -eq $null){
+                                            # Done
+                                        }else{
+                                            # check if
+                                                function loop{
+                                                    if ($foundIndex -eq 0){
+                                                        break
+                                                    }
+                                                    $checkSpace = $info.Substring(($foundIndex-1),1)
+                                                    if ($checkSpace -eq " " -or $checkSpace -eq "" -or $checkSpace -eq $null){
+                                                        $foundIndex = $foundIndex - 1
+                                                        loop
+                                                    }else{
+                                                        $tempName = $info.Substring(0,$foundIndex)
+                                                        if (($tempName.Length +3) -le 100){
+                                                            $info = "$tempName..."
+                                                        }else{
+                                                            $foundIndex = $foundIndex - 1
+                                                            loop
+                                                        }
+                                                    }
+                                                }
+                                                loop
                                         }
-				                    }
                                 }
-                                # Import MyPack
-                                $Global:MyPackSelect = Get-ChildItem -Path "$Global:MyPackPath\Pack" -File | Select -Property BaseName,Name,Extension
-			                    if ($Global:MyPackSelect -eq $null){
-				                    $Global:ErrorCodeVal = 673
-				                    ExitLogWrite
-				                    #LocalLogWrite "Failed to load Single Option Scripts"
-			                    }else{
-                                    $Global:Imported = $true
-                                    $Global:MyPackSelectCount = $Global:MyPackSelect.Count
-                                    if ($Global:MyPackSelectCount -eq $null){
-                                        $Global:MyPackSelectCount = 1
-                                    }
-			                        for ($i = 0; $i -lt $Global:MyPackSelectCount; $i++){
-				                        if ($Global:MyPackSelect[$i].Name -ne "MyPack.in"){
-                                            if ($Global:MyPackSelect[$i].Name -ne "README.txt"){
-					                            $FileName = $Global:MyPackSelect[$i].BaseName
-					                            $ScriptSelect_Combobox.Items.Add($FileName) | Out-Null
-				                            }
+                        if (-not ($info -eq $null -or $info -eq "")){
+                            #$Global:MyPack = Get-Content -Path "$Global:MyPackPath\Pack\MyPack.in"
+                            # Import MyPack Confirmation Form
+
+                                ##############################################
+                                ##############################################
+
+                                    $ImportMyPackConfirmation_Form = New-Object $Form_Object
+                                    $ImportMyPackConfirmation_Form.Text = "MyPack - Import"
+                                    $ImportMyPackConfirmation_Form.ClientSize = New-Object System.Drawing.Point(250,125)
+                                    $ImportMyPackConfirmation_Form.FormBorderStyle = "Fixed3D" #FixedDialog, Fixed3D
+                                    $ImportMyPackConfirmation_Form.StartPosition = [Windows.Forms.FormStartPosition]::CenterScreen
+                                    $ImportMyPackConfirmation_Form.Icon = $Global:imgIcon
+                                    $ImportMyPackConfirmation_Form.Add_FormClosing({
+                                        $ImportMyPackConfirmation_Form.Dispose()
+                                    })
+
+                                    $ImportMyPackConfirmation_Label = New-Object $Label_Object
+                                    $ImportMyPackConfirmation_Label.Text = "Do you want to import`n${info}?"
+                                    $ImportMyPackConfirmation_Label.Font = New-Object System.Drawing.Font("Calibri",11)
+                                    $ImportMyPackConfirmation_Label.TextAlign = "MiddleCenter"
+                                    $ImportMyPackConfirmation_Label.Size = New-Object System.Drawing.Point(250,80)
+                                    $ImportMyPackConfirmation_Label.Location = New-Object System.Drawing.Point(0,0)
+
+                                    $ImportMyPackConfirmationConfirm_Button = New-Object $Button_Object
+                                    $ImportMyPackConfirmationConfirm_Button.Text = "Yes"
+                                    $ImportMyPackConfirmationConfirm_Button.Font = New-Object System.Drawing.Font("Calibri",11)
+                                    $ImportMyPackConfirmationConfirm_Button.Size = New-Object System.Drawing.Point(80,25)
+                                    $ImportMyPackConfirmationConfirm_Button.Location = New-Object System.Drawing.Point(20,80)
+                                    $ImportMyPackConfirmationConfirm_Button.Add_Click({
+                                        # Clear all ScriptS
+                                        $ScriptSelect_Combobox.Items.Clear()
+                                        # Import AppPack
+			                            $Global:ScriptSelect = Get-ChildItem -Path "$Global:AppPackPath\Single" -File | Select -Property BaseName,Name,Extension
+			                            if ($Global:ScriptSelect -eq $null){
+				                            $Global:ErrorCodeVal += "204;"
+				                            ExitLogWrite
+                                            LocalLogWrite "ERR: Failed Importing Sysa AppPack (Single)"
+				                            #LocalLogWrite "Failed to load Single Option Scripts"
+			                            }else{
+			                                $Global:ScriptSelectCount = $Global:ScriptSelect.Count
+                                            if ($Global:ScriptSelectCount -eq $null){
+                                                $Global:ScriptSelectCount = 1
+                                            }
+			                                for ($i = 0; $i -lt $Global:ScriptSelectCount; $i++){
+				                                if ($Global:ScriptSelect[$i].Name -ne "AppPack.in"){
+                                                    if ($Global:ScriptSelect[$i].Name -ne "README.txt"){
+					                                    $FileName = $Global:ScriptSelect[$i].BaseName
+					                                    $ScriptSelect_Combobox.Items.Add($FileName) | Out-Null
+				                                    }
+                                                }
+			                                }
                                         }
-			                        }
-                                }
-                                LocalLogWrite "Imported MyPack : '$Global:MyPack'"
-                                LocalLogWrite "*---------------------------------*"
+                                        # Import MyPack
+                                        $Global:MyPackSelect = Get-ChildItem -Path "$Global:MyPackPath\Pack" -File | Select -Property BaseName,Name,Extension
+		                                if ($Global:MyPackSelect -eq $null){
+			                                $Global:ErrorCodeVal = 673
+			                                ExitLogWrite
+                                            LocalLogWrite "ERR: Failed Importing Pack"
+			                                #LocalLogWrite "Failed to load Single Option Scripts"
+		                                }else{
+                                            $Global:MyPackSelectCount = $Global:MyPackSelect.Count
+                                            if ($Global:MyPackSelectCount -eq $null){
+                                                $Global:MyPackSelectCount = 1
+                                            }
+		                                    for ($i = 0; $i -lt $Global:MyPackSelectCount; $i++){
+			                                    if ($Global:MyPackSelect[$i].Name -ne "MyPack.in"){
+                                                    if ($Global:MyPackSelect[$i].Name -ne "README.txt"){
+				                                        $FileName = $Global:MyPackSelect[$i].BaseName
+				                                        $ScriptSelect_Combobox.Items.Add($FileName) | Out-Null
+			                                        }
+                                                }
+		                                    }
+                                            $Global:Imported = $true
+                                            $RunMenuItem_ImportMyPack.Enabled = $false
+                                            LocalLogWrite "Imported MyPack : '$info'"
+                                        }
+                                        LocalLogWrite "*---------------------------------*"
+                                        $ImportMyPackConfirmation_Form.Dispose()
+                                    })
 
-                                $ImportMyPackConfirmation_Form.Dispose()
-                            })
+                                    $ImportMyPackConfirmationCancel_Button = New-Object $Button_Object
+                                    $ImportMyPackConfirmationCancel_Button.Text = "Cancel"
+                                    $ImportMyPackConfirmationCancel_Button.Font = New-Object System.Drawing.Font("Calibri",11)
+                                    $ImportMyPackConfirmationCancel_Button.Size = New-Object System.Drawing.Point(80,25)
+                                    $ImportMyPackConfirmationCancel_Button.Location = New-Object System.Drawing.Point(150,80)
+                                    $ImportMyPackConfirmationCancel_Button.Add_Click({
+                                        $ImportMyPackConfirmation_Form.Dispose()
+                                    })
 
-                            $ImportMyPackConfirmationCancel_Button = New-Object $Button_Object
-                            $ImportMyPackConfirmationCancel_Button.Text = "Cancel"
-                            $ImportMyPackConfirmationCancel_Button.Font = New-Object System.Drawing.Font("Calibri",11)
-                            $ImportMyPackConfirmationCancel_Button.Size = New-Object System.Drawing.Point(80,25)
-                            $ImportMyPackConfirmationCancel_Button.Location = New-Object System.Drawing.Point(150,80)
-                            $ImportMyPackConfirmationCancel_Button.Add_Click({
-                                $ImportMyPackConfirmation_Form.Dispose()
-                            })
+                                    $ImportMyPackConfirmation_Form.Controls.AddRange(@(
+                                        $ImportMyPackConfirmation_Label
+                                        $ImportMyPackConfirmationConfirm_Button
+                                        $ImportMyPackConfirmationCancel_Button
+                                    ))
 
-                            $ImportMyPackConfirmation_Form.Controls.AddRange(@(
-                                $ImportMyPackConfirmation_Label
-                                $ImportMyPackConfirmationConfirm_Button
-                                $ImportMyPackConfirmationCancel_Button
-                            ))
-
-                            $ImportMyPackConfirmation_Form.ShowDialog() | Out-Null
+                                    $ImportMyPackConfirmation_Form.ShowDialog() | Out-Null
+                        }else{
+                            LocalLogWrite "MyPack.in file has no contents"
+                            # check if there is contents
+                            $contCheck = $null
+                            $contCheck = Get-ChildItem -Path "$Global:MyPackPath\Pack"
+                            if ($contCheck){
+                                $qtdt = $null
+                                $qtdt = Get-Date -Format MM.dd.yy_HH.mm.ss
+                                LocalLogWrite "Bad info File. Found Pack Contents."
+                                New-Item -Name "qt" -ItemType Directory -Path "$Global:MyPackPath" -Force -Confirm:$false | Out-Null
+                                Compress-Archive -Path "$Global:MyPackPath\Pack" -DestinationPath "$Global:MyPackPath\qt\$qtdt`_qtp.zip" -Update -Confirm:$false | Out-Null
+                                Remove-Item -Path "$Global:MyPackPath\Pack" -Recurse -Force -Confirm:$false | Out-Null
+                                New-Item -Name "Pack" -ItemType Directory -Path "$Global:MyPackPath" -Force -Confirm:$false | Out-Null
+                                LocalLogWrite "ERR: Pack invalid. Sent to quarantine. '$Global:MyPackPath\qt\$qtdt`_qtp'"
+                            }
+                            LocalLogWrite "*---------------------------------*"
+                        }
+                    $RunMenuItem_ImportMyPack.Enabled = $false
                 }else{
-                    LocalLogWrite "No MyPack.in file found in Pack"
+                    LocalLogWrite "No MyPack.in file found"
+                    # check if there is contents
+                    $contCheck = $null
+                    $contCheck = Get-ChildItem -Path "$Global:MyPackPath\Pack"
+                    if ($contCheck){
+                        $qtdt = $null
+                        $qtdt = Get-Date -Format MM.dd.yy_HH.mm.ss
+                        LocalLogWrite "Bad info File. Found Pack Contents."
+                        New-Item -Name "qt" -ItemType Directory -Path "$Global:MyPackPath" -Force -Confirm:$false | Out-Null
+                        Compress-Archive -Path "$Global:MyPackPath\Pack" -DestinationPath "$Global:MyPackPath\qt\$qtdt`_qtp.zip" -Update -Confirm:$false | Out-Null
+                        Remove-Item -Path "$Global:MyPackPath\Pack" -Recurse -Force -Confirm:$false | Out-Null
+                        New-Item -Name "Pack" -ItemType Directory -Path "$Global:MyPackPath" -Force -Confirm:$false | Out-Null
+                        LocalLogWrite "ERR: Pack invalid. Sent to quarantine. '$Global:MyPackPath\qt\$qtdt`_qtp'"
+                    }
                     LocalLogWrite "*---------------------------------*"
                 }
+                $RunMenuItem_ImportMyPack.Enabled = $false
             })
             $RunMenuItem_LoadMyPack = New-Object System.Windows.Forms.ToolStripMenuItem("Load MyPack")
             $RunMenuItem_LoadMyPack.Add_Click({
                 $Global:MyPackPath = "$Global:AppPackPath\MyPack"
-                $Global:MyPack_Packs = Get-ChildItem $Global:MyPackPath -Directory -Exclude "Pack" | select -ExpandProperty Name 
+                $Global:MyPack_Packs = Get-ChildItem $Global:MyPackPath -Directory -Exclude "Pack","qt" | select -ExpandProperty Name 
                     # Load MyPack Form
 
                     ##############################################
@@ -867,7 +934,7 @@ Uninstall
 				            if ($Global:ScriptSelect -eq $null){
 					            $Global:ErrorCodeVal += "204;"
 					            ExitLogWrite
-					            #LocalLogWrite "Failed to load Single Option Scripts"
+					            LocalLogWrite "ERR: Failed Loading Pack"
 				            }else{
                                 # Clear all ScriptS
                                     $ScriptSelect_Combobox.Items.Clear()
@@ -891,40 +958,7 @@ Uninstall
                                 # Load New Pack Selected
                                     Copy-Item -Path "$Global:AppPackPath\MyPack\$Global:MyPackLoad" -Destination "$Global:AppPackPath\MyPack\Pack" -Recurse  -Force -Confirm:$false | Out-Null
                                     LocalLogWrite "Loaded $Global:MyPackLoad Pack"
-
-                                # Get MyPack Info
-                                    $Global:MyPack = Get-Content -Path "$Global:MyPackPath\Pack\MyPack.in"
-                                # Shorten the MyPack info if over $foundIndex
-                                    $foundIndex = 100
-                                    if ($Global:MyPack.Length -gt $foundIndex){
-                                        #$foundIndex = $foundIndex - 1 
-                                            $tempName = $Global:MyPack.Substring(0,($foundIndex-1))
-                                            $checkSpace = $Global:MyPack.Substring($foundIndex,1)
-                                            if ($checkSpace -eq " " -or $checkSpace -eq "" -or $checkSpace -eq $null){
-                                                # Done
-                                            }else{
-                                                # check if
-                                                    function loop{
-                                                        if ($foundIndex -eq 0){
-                                                            break
-                                                        }
-                                                        $checkSpace = $Global:MyPack.Substring(($foundIndex-1),1)
-                                                        if ($checkSpace -eq " " -or $checkSpace -eq "" -or $checkSpace -eq $null){
-                                                            $foundIndex = $foundIndex - 1
-                                                            loop
-                                                        }else{
-                                                            $tempName = $Global:MyPack.Substring(0,$foundIndex)
-                                                            if (($tempName.Length +3) -le 100){
-                                                                $Global:MyPack = "$tempName..."
-                                                            }else{
-                                                                $foundIndex = $foundIndex - 1
-                                                                loop
-                                                            }
-                                                        }
-                                                    }
-                                                    loop
-                                            }
-                                    }
+                                    $RunMenuItem_ImportMyPack.Enabled = $true
                             }
                             $tempName = $null
                             $foundIndex = $null
@@ -943,10 +977,37 @@ Uninstall
             })
             $RunMenuItem_ClearMyPack = New-Object System.Windows.Forms.ToolStripMenuItem("Clear MyPack")
             $RunMenuItem_ClearMyPack.Add_Click({
-                #$MyPackInfo = Get-Content -Path "$Global:AppPackPath\MyPack\Pack\MyPack.in" -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-                if ($Global:MyPack -eq $null){
-                    LocalLogWrite "ERR: No Pack Info Found"
-                    LocalLogWrite "*---------------------------------*"
+                $info = $null
+                $Global:MyPackPath = "$Global:AppPackPath\MyPack"
+                # Check Imported
+                $info = Get-Content -Path "$Global:MyPackPath\Pack\MyPack.in" -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+                if ($info -eq $null -or $info -eq ""){
+                    # Check for Pack Directory
+                    if (Test-Path "$Global:MyPackPath\Pack"){
+                        # check if there is contents
+                        $contCheck = $null
+                        $contCheck = Get-ChildItem -Path "$Global:MyPackPath\Pack"
+                        if ($contCheck){
+                            $qtdt = $null
+                            $qtdt = Get-Date -Format MM.dd.yyy_HH.mm.ss
+                            LocalLogWrite "Bad Pack File"
+                            LocalLogWrite "Found Contents"
+                            New-Item -Name "qt" -ItemType Directory -Path "$Global:MyPackPath" -Force -Confirm:$false | Out-Null
+                            Compress-Archive -Path "$Global:MyPackPath\Pack" -DestinationPath "$Global:MyPackPath\qt\$qtdt`_qtp.zip" -Update -Confirm:$false | Out-Null
+                            Remove-Item -Path "$Global:MyPackPath\Pack" -Recurse -Force -Confirm:$force | Out-Null
+                            New-Item -Name "Pack" -ItemType Directory -Path "$Global:MyPackPath" -Force -Confirm:$false | Out-Null
+                            LocalLogWrite "ERR: Pack invalid. Sent to quarantine. '$Global:MyPackPath\qt\$qtdt`_qtp'"
+                            LocalLogWrite "*---------------------------------*"
+                        }else{
+                            LocalLogWrite "ERR: No Pack Info Found"
+                            LocalLogWrite "*---------------------------------*"
+                        }
+                    }else{
+                        LocalLogWrite "No Pack Directory"
+                        LocalLogWrite "Remaking Pack Directory"
+                        New-Item -Name "Pack" -ItemType Directory -Path "$Global:MyPackPath" -Force -Confirm:$false | Out-Null
+                        LocalLogWrite "*---------------------------------*"
+                    }
                 }else{
                     # Import MyPack Confirmation Form
 
@@ -964,7 +1025,7 @@ Uninstall
                         })
 
                         $ClearMyPackConfirmation_Label = New-Object $Label_Object
-                        $ClearMyPackConfirmation_Label.Text = "Do you want to Clear`n${Global:MyPack}?"
+                        $ClearMyPackConfirmation_Label.Text = "Do you want to Clear`n${info}?"
                         $ClearMyPackConfirmation_Label.Font = New-Object System.Drawing.Font("Calibri",11)
                         $ClearMyPackConfirmation_Label.TextAlign = "MiddleCenter"
                         $ClearMyPackConfirmation_Label.Size = New-Object System.Drawing.Point(250,80)
@@ -981,7 +1042,7 @@ Uninstall
 				            if ($Global:ScriptSelect -eq $null){
 					            $Global:ErrorCodeVal += "204;"
 					            ExitLogWrite
-					            #LocalLogWrite "Failed to load Single Option Scripts"
+					            LocalLogWrite "ERR: Failed Clearing Pack"
 				            }else{
                                 # Clear all ScriptS
                                 $ScriptSelect_Combobox.Items.Clear()
@@ -1002,10 +1063,10 @@ Uninstall
                                 # Remove MyPack\Pack contents
                                 Remove-Item -Path "$Global:AppPackPath\MyPack\Pack" -Recurse -Force -Confirm:$false | Out-Null
                                 New-Item -Name "Pack" -ItemType Directory -Path "$Global:AppPackPath\MyPack" -Force -Confirm:$false | Out-Null
-                                LocalLogWrite "Cleared $MyPackInfo"
-                                $Global:MyPack = $null
+                                LocalLogWrite "Clearing $info Pack"
                             }
                             LocalLogWrite "*---------------------------------*"
+                            $info = $null
                             $ClearMyPackConfirmation_Form.Dispose()
                         })
 
@@ -1018,12 +1079,12 @@ Uninstall
                             $ClearMyPackConfirmation_Form.Dispose()
                         })
 
-                    $ClearMyPackConfirmation_Form.Controls.AddRange(@(
-                        $ClearMyPackConfirmation_Label
-                        $ClearMyPackConfirmationConfirm_Button
-                        $ClearMyPackConfirmationCancel_Button
-                    ))
-                    $ClearMyPackConfirmation_Form.ShowDialog() | Out-Null
+                        $ClearMyPackConfirmation_Form.Controls.AddRange(@(
+                            $ClearMyPackConfirmation_Label
+                            $ClearMyPackConfirmationConfirm_Button
+                            $ClearMyPackConfirmationCancel_Button
+                        ))
+                        $ClearMyPackConfirmation_Form.ShowDialog() | Out-Null
                 }
             })
 			$RunMenuItem_Script = New-Object System.Windows.Forms.ToolStripMenuItem("Script")
@@ -1042,7 +1103,7 @@ Uninstall
 			# HELP Drop Down List
 			$HelpMenuItem_Help = New-Object System.Windows.Forms.ToolStripMenuItem("Help")
 			$HelpMenuItem_Help.Add_Click({
-				Start-Process -FilePath "$Drive\Sysa\AppPack\README.txt"
+				Start-Process -FilePath "$Drive\Sysa\README.txt"
 			})
 			$HelpMenuItem_Update = New-Object System.Windows.Forms.ToolStripMenuItem("Update")
             $HelpMenuItem_Update.Enabled = $false
@@ -1150,9 +1211,10 @@ Uninstall
                                     $n = $null
                                 }
                             }else{
-                                New-Item -Name "qt" -ItemType Directory -Path "$Global:StartPath\Files" -Force -Confirm:$false | Out-Null 
-                                Move-Item -Path "$Global:StartPath\Files\$t" -Destination "$Global:StartPath\Files\qt\$t" -Force -Confirm:$false | Out-Null
-                                LocalLogWrite "Moved file to quarantine '$Global:StartPath\Files\qt'" 
+                                New-Item -Name "qt" -ItemType Directory -Path "$Global:MyPackPath" -Force -Confirm:$false | Out-Null
+                                Compress-Archive -Path "$Global:MyPackPath\Pack" -DestinationPath "$Global:MyPackPath\qt\$qtdt`_qtp.zip" -Update -Confirm:$false | Out-Null
+                                Remove-Item -Path "$Global:MyPackPath\Pack" -Recurse -Force -Confirm:$force | Out-Null
+                                New-Item -Name "Pack" -ItemType Directory -Path "$Global:MyPackPath" -Force -Confirm:$false | Out-Null
                             }
                         }
                     }
@@ -1181,6 +1243,8 @@ Uninstall
                     $t = 3
 				}
 				$Global:FullDateTime = Get-Date -DisplayHint Date
+                $info= $null
+                $Global:Imported = $false
                 LocalLogWrite "--Closeing Utility--"
 				ExitLogWrite
 				Start-Sleep -Seconds $t | Out-Null
