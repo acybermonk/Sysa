@@ -229,6 +229,7 @@ if ($unistConfirm -eq "OK"){
         $FileDirPath = 
         $Found =
         $log = $null
+        $Global:info = $null
         utilLog "    - Successfully set variables to null"
 
     # Close all open/active Sysa Util

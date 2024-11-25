@@ -715,33 +715,35 @@ Uninstall
             $RunMenuItem_ImportMyPack = New-Object System.Windows.Forms.ToolStripMenuItem("Import MyPack")
             $RunMenuItem_ImportMyPack.Enabled = $false
             $RunMenuItem_ImportMyPack.Add_Click({
-                $info = $null
+                $Global:info = $null
                 $Global:MyPackPath = "$Global:AppPackPath\MyPack"
                 if (Test-Path "$Global:MyPackPath\Pack\MyPack.in"){
                     # Check Imported
-                        $info = Get-Content -Path "$Global:MyPackPath\Pack\MyPack.in" -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+                        $Global:info = Get-Content -Path "$Global:MyPackPath\Pack\MyPack.in" -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
                             # Shorten the MyPack info if over $foundIndex
                                 $foundIndex = 100
-                                if ($info.Length -gt $foundIndex){
+                                if ($Global:info.Length -gt $foundIndex){
                                     #$foundIndex = $foundIndex - 1 
-                                        $tempName = $info.Substring(0,($foundIndex-1))
-                                        $checkSpace = $info.Substring($foundIndex,1)
+                                        $tempName = $Global:info.Substring(0,($foundIndex-1))
+                                        $checkSpace = $Global:info.Substring($foundIndex,1)
                                         if ($checkSpace -eq " " -or $checkSpace -eq "" -or $checkSpace -eq $null){
+                                            # Check
                                             # Done
+
                                         }else{
                                             # check if
                                                 function loop{
                                                     if ($foundIndex -eq 0){
                                                         break
                                                     }
-                                                    $checkSpace = $info.Substring(($foundIndex-1),1)
+                                                    $checkSpace = $Global:info.Substring(($foundIndex-1),1)
                                                     if ($checkSpace -eq " " -or $checkSpace -eq "" -or $checkSpace -eq $null){
                                                         $foundIndex = $foundIndex - 1
                                                         loop
                                                     }else{
-                                                        $tempName = $info.Substring(0,$foundIndex)
+                                                        $tempName = $Global:info.Substring(0,$foundIndex)
                                                         if (($tempName.Length +3) -le 100){
-                                                            $info = "$tempName..."
+                                                            $Global:info = "$tempName..."
                                                         }else{
                                                             $foundIndex = $foundIndex - 1
                                                             loop
@@ -751,7 +753,7 @@ Uninstall
                                                 loop
                                         }
                                 }
-                        if (-not ($info -eq $null -or $info -eq "")){
+                        if (-not ($Global:info -eq $null -or $Global:info -eq "")){
                             #$Global:MyPack = Get-Content -Path "$Global:MyPackPath\Pack\MyPack.in"
                             # Import MyPack Confirmation Form
 
@@ -760,7 +762,7 @@ Uninstall
 
                                     $ImportMyPackConfirmation_Form = New-Object $Form_Object
                                     $ImportMyPackConfirmation_Form.Text = "MyPack - Import"
-                                    $ImportMyPackConfirmation_Form.ClientSize = New-Object System.Drawing.Point(250,125)
+                                    $ImportMyPackConfirmation_Form.ClientSize = New-Object System.Drawing.Point(250,155)
                                     $ImportMyPackConfirmation_Form.FormBorderStyle = "Fixed3D" #FixedDialog, Fixed3D
                                     $ImportMyPackConfirmation_Form.StartPosition = [Windows.Forms.FormStartPosition]::CenterScreen
                                     $ImportMyPackConfirmation_Form.Icon = $Global:imgIcon
@@ -769,17 +771,17 @@ Uninstall
                                     })
 
                                     $ImportMyPackConfirmation_Label = New-Object $Label_Object
-                                    $ImportMyPackConfirmation_Label.Text = "Do you want to import`n${info}?"
+                                    $ImportMyPackConfirmation_Label.Text = "Do you want to import`n${Global:info}?"
                                     $ImportMyPackConfirmation_Label.Font = New-Object System.Drawing.Font("Calibri",11)
                                     $ImportMyPackConfirmation_Label.TextAlign = "MiddleCenter"
-                                    $ImportMyPackConfirmation_Label.Size = New-Object System.Drawing.Point(250,80)
-                                    $ImportMyPackConfirmation_Label.Location = New-Object System.Drawing.Point(0,0)
+                                    $ImportMyPackConfirmation_Label.Size = New-Object System.Drawing.Point(250,100)
+                                    $ImportMyPackConfirmation_Label.Location = New-Object System.Drawing.Point(0,10)
 
                                     $ImportMyPackConfirmationConfirm_Button = New-Object $Button_Object
                                     $ImportMyPackConfirmationConfirm_Button.Text = "Yes"
                                     $ImportMyPackConfirmationConfirm_Button.Font = New-Object System.Drawing.Font("Calibri",11)
                                     $ImportMyPackConfirmationConfirm_Button.Size = New-Object System.Drawing.Point(80,25)
-                                    $ImportMyPackConfirmationConfirm_Button.Location = New-Object System.Drawing.Point(20,80)
+                                    $ImportMyPackConfirmationConfirm_Button.Location = New-Object System.Drawing.Point(20,120)
                                     $ImportMyPackConfirmationConfirm_Button.Add_Click({
                                         # Clear all ScriptS
                                         $ScriptSelect_Combobox.Items.Clear()
@@ -826,7 +828,7 @@ Uninstall
 		                                    }
                                             $Global:Imported = $true
                                             $RunMenuItem_ImportMyPack.Enabled = $false
-                                            LocalLogWrite "Imported MyPack : '$info'"
+                                            LocalLogWrite "Imported MyPack : '$Global:info'"
                                         }
                                         LocalLogWrite "*---------------------------------*"
                                         $ImportMyPackConfirmation_Form.Dispose()
@@ -836,15 +838,15 @@ Uninstall
                                     $ImportMyPackConfirmationCancel_Button.Text = "Cancel"
                                     $ImportMyPackConfirmationCancel_Button.Font = New-Object System.Drawing.Font("Calibri",11)
                                     $ImportMyPackConfirmationCancel_Button.Size = New-Object System.Drawing.Point(80,25)
-                                    $ImportMyPackConfirmationCancel_Button.Location = New-Object System.Drawing.Point(150,80)
+                                    $ImportMyPackConfirmationCancel_Button.Location = New-Object System.Drawing.Point(150,120)
                                     $ImportMyPackConfirmationCancel_Button.Add_Click({
                                         $ImportMyPackConfirmation_Form.Dispose()
                                     })
 
                                     $ImportMyPackConfirmation_Form.Controls.AddRange(@(
-                                        $ImportMyPackConfirmation_Label
                                         $ImportMyPackConfirmationConfirm_Button
                                         $ImportMyPackConfirmationCancel_Button
+                                        $ImportMyPackConfirmation_Label
                                     ))
 
                                     $ImportMyPackConfirmation_Form.ShowDialog() | Out-Null
@@ -977,11 +979,44 @@ Uninstall
             })
             $RunMenuItem_ClearMyPack = New-Object System.Windows.Forms.ToolStripMenuItem("Clear MyPack")
             $RunMenuItem_ClearMyPack.Add_Click({
-                $info = $null
+                $Global:info = $null
                 $Global:MyPackPath = "$Global:AppPackPath\MyPack"
                 # Check Imported
-                $info = Get-Content -Path "$Global:MyPackPath\Pack\MyPack.in" -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-                if ($info -eq $null -or $info -eq ""){
+                $Global:info = Get-Content -Path "$Global:MyPackPath\Pack\MyPack.in" -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+                        # Shorten the MyPack info if over $foundIndex
+                            $foundIndex = 100
+                            if ($Global:info.Length -gt $foundIndex){
+                                #$foundIndex = $foundIndex - 1 
+                                    $tempName = $Global:info.Substring(0,($foundIndex-1))
+                                    $checkSpace = $Global:info.Substring($foundIndex,1)
+                                    if ($checkSpace -eq " " -or $checkSpace -eq "" -or $checkSpace -eq $null){
+                                        # Check
+                                        # Done
+
+                                    }else{
+                                        # check if
+                                            function loop{
+                                               if ($foundIndex -eq 0){
+                                                    break
+                                                }
+                                                $checkSpace = $Global:info.Substring(($foundIndex-1),1)
+                                                if ($checkSpace -eq " " -or $checkSpace -eq "" -or $checkSpace -eq $null){
+                                                    $foundIndex = $foundIndex - 1
+                                                    loop
+                                                }else{
+                                                    $tempName = $Global:info.Substring(0,$foundIndex)
+                                                    if (($tempName.Length +3) -le 100){
+                                                        $Global:info = "$tempName..."
+                                                    }else{
+                                                        $foundIndex = $foundIndex - 1
+                                                        loop
+                                                    }
+                                                }
+                                            }
+                                            loop
+                                    }
+                            }
+                if ($Global:info -eq $null -or $Global:info -eq ""){
                     # Check for Pack Directory
                     if (Test-Path "$Global:MyPackPath\Pack"){
                         # check if there is contents
@@ -1016,7 +1051,7 @@ Uninstall
 
                         $ClearMyPackConfirmation_Form = New-Object $Form_Object
                         $ClearMyPackConfirmation_Form.Text = "MyPack - Clear"
-                        $ClearMyPackConfirmation_Form.ClientSize = New-Object System.Drawing.Point(250,125)
+                        $ClearMyPackConfirmation_Form.ClientSize = New-Object System.Drawing.Point(250,155)
 	                    $ClearMyPackConfirmation_Form.FormBorderStyle = "Fixed3D" #FixedDialog, Fixed3D
 	                    $ClearMyPackConfirmation_Form.StartPosition = [Windows.Forms.FormStartPosition]::CenterScreen
 	                    $ClearMyPackConfirmation_Form.Icon = $Global:imgIcon
@@ -1025,17 +1060,17 @@ Uninstall
                         })
 
                         $ClearMyPackConfirmation_Label = New-Object $Label_Object
-                        $ClearMyPackConfirmation_Label.Text = "Do you want to Clear`n${info}?"
+                        $ClearMyPackConfirmation_Label.Text = "Do you want to Clear`n${Global:info}?"
                         $ClearMyPackConfirmation_Label.Font = New-Object System.Drawing.Font("Calibri",11)
                         $ClearMyPackConfirmation_Label.TextAlign = "MiddleCenter"
-                        $ClearMyPackConfirmation_Label.Size = New-Object System.Drawing.Point(250,80)
-                        $ClearMyPackConfirmation_Label.Location = New-Object System.Drawing.Point(0,0)
+                        $ClearMyPackConfirmation_Label.Size = New-Object System.Drawing.Point(250,100)
+                        $ClearMyPackConfirmation_Label.Location = New-Object System.Drawing.Point(0,10)
 
                         $ClearMyPackConfirmationConfirm_Button = New-Object $Button_Object
                         $ClearMyPackConfirmationConfirm_Button.Text = "Yes"
                         $ClearMyPackConfirmationConfirm_Button.Font = New-Object System.Drawing.Font("Calibri",11)
                         $ClearMyPackConfirmationConfirm_Button.Size = New-Object System.Drawing.Point(80,25)
-                        $ClearMyPackConfirmationConfirm_Button.Location = New-Object System.Drawing.Point(20,80)
+                        $ClearMyPackConfirmationConfirm_Button.Location = New-Object System.Drawing.Point(20,120)
                         $ClearMyPackConfirmationConfirm_Button.Add_Click({
                             # Import AppPack
 				            $Global:ScriptSelect = Get-ChildItem -Path "$Global:AppPackPath\Single" -File | Select -Property BaseName,Name,Extension
@@ -1063,10 +1098,10 @@ Uninstall
                                 # Remove MyPack\Pack contents
                                 Remove-Item -Path "$Global:AppPackPath\MyPack\Pack" -Recurse -Force -Confirm:$false | Out-Null
                                 New-Item -Name "Pack" -ItemType Directory -Path "$Global:AppPackPath\MyPack" -Force -Confirm:$false | Out-Null
-                                LocalLogWrite "Clearing $info Pack"
+                                LocalLogWrite "Clearing $Global:info Pack"
                             }
                             LocalLogWrite "*---------------------------------*"
-                            $info = $null
+                            $Global:info = $null
                             $ClearMyPackConfirmation_Form.Dispose()
                         })
 
@@ -1074,15 +1109,15 @@ Uninstall
                         $ClearMyPackConfirmationCancel_Button.Text = "Cancel"
                         $ClearMyPackConfirmationCancel_Button.Font = New-Object System.Drawing.Font("Calibri",11)
                         $ClearMyPackConfirmationCancel_Button.Size = New-Object System.Drawing.Point(80,25)
-                        $ClearMyPackConfirmationCancel_Button.Location = New-Object System.Drawing.Point(150,80)
+                        $ClearMyPackConfirmationCancel_Button.Location = New-Object System.Drawing.Point(150,120)
                         $ClearMyPackConfirmationCancel_Button.Add_Click({
                             $ClearMyPackConfirmation_Form.Dispose()
                         })
 
                         $ClearMyPackConfirmation_Form.Controls.AddRange(@(
-                            $ClearMyPackConfirmation_Label
                             $ClearMyPackConfirmationConfirm_Button
                             $ClearMyPackConfirmationCancel_Button
+                            $ClearMyPackConfirmation_Label
                         ))
                         $ClearMyPackConfirmation_Form.ShowDialog() | Out-Null
                 }
@@ -1243,7 +1278,7 @@ Uninstall
                     $t = 3
 				}
 				$Global:FullDateTime = Get-Date -DisplayHint Date
-                $info= $null
+                $Global:info= $null
                 $Global:Imported = $false
                 LocalLogWrite "--Closeing Utility--"
 				ExitLogWrite
