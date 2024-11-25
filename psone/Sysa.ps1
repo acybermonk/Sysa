@@ -1033,10 +1033,11 @@ Uninstall
                             New-Item -Name "Pack" -ItemType Directory -Path "$Global:MyPackPath" -Force -Confirm:$false | Out-Null
                             LocalLogWrite "ERR: Pack invalid. Sent to quarantine. '$Global:MyPackPath\qt\$qtdt`_qtp'"
                             LocalLogWrite "*---------------------------------*"
-                        }else{
+                        }
+                        <#else{
                             LocalLogWrite "ERR: No Pack Info Found"
                             LocalLogWrite "*---------------------------------*"
-                        }
+                        }#>
                     }else{
                         LocalLogWrite "No Pack Directory"
                         LocalLogWrite "Remaking Pack Directory"
@@ -1096,6 +1097,7 @@ Uninstall
                                     }
 				                }
                                 # Remove MyPack\Pack contents
+                                $RunMenuItem_ImportMyPack.Enabled = $false
                                 Remove-Item -Path "$Global:AppPackPath\MyPack\Pack" -Recurse -Force -Confirm:$false | Out-Null
                                 New-Item -Name "Pack" -ItemType Directory -Path "$Global:AppPackPath\MyPack" -Force -Confirm:$false | Out-Null
                                 LocalLogWrite "Clearing $Global:info Pack"
