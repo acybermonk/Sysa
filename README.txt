@@ -1,6 +1,6 @@
 Sysa 
 :the admin utility
-v1.2.5
+v1.2.6
 
 READ ME
 
