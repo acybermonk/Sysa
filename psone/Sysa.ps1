@@ -395,6 +395,10 @@ Uninstall
                                     }
                                     checkDuplicate
                                     $n = $null
+                                }else{
+                                    Move-Item -Path "$Global:StartPath\Files\$t" -Destination "$Global:StartPath\Files\qt\$t" -Force -Confirm:$false | Out-Null
+                                    LocalLogWrite "You Moved file to quarantine '$Global:StartPath\Files\qt'"
+                                    LocalLogWrite "*---------------------------------*"
                                 }
                             }else{
                                 New-Item -Name "qt" -ItemType Directory -Path "$Global:StartPath\Files" -Force -Confirm:$false | Out-Null
@@ -1212,6 +1216,8 @@ Uninstall
 			$MainForm.Icon = $Global:ImgIcon
             $MainForm.MainMenuStrip = $ToolbarStrip
             $MainForm.Add_Load({
+                checkFiles
+<#
                 $Global:GroupFileOptions = Get-ChildItem -Path "$Global:StartPath\Files" -File | Select -Property BaseName,Name,Extension
                 if ($Global:GroupFileOptions -eq $null){
 					$Global:ErrorCodeVal = 547
@@ -1246,9 +1252,13 @@ Uninstall
                                     }
                                     checkDuplicate
                                     $n = $null
+                                }else{
+                                    Move-Item -Path "$Global:StartPath\Files\$t" -Destination "$Global:StartPath\Files\qt\$t" -Force -Confirm:$false | Out-Null
+                                    LocalLogWrite "You Moved file to quarantine '$Global:StartPath\Files\qt'"
+                                    LocalLogWrite "*---------------------------------*"
                                 }
                             }else{
-                                New-Item -Name "qt" -ItemType Directory -Path "$Global:MyPackPath" -Force -Confirm:$false | Out-Null
+                                New-Item -Name "qt" -ItemType Directory -Path "$Global:StartPath\Files" -Force -Confirm:$false | Out-Null
                                 Compress-Archive -Path "$Global:MyPackPath\Pack" -DestinationPath "$Global:MyPackPath\qt\$qtdt`_qtp.zip" -Update -Confirm:$false | Out-Null
                                 Remove-Item -Path "$Global:MyPackPath\Pack" -Recurse -Force -Confirm:$force | Out-Null
                                 New-Item -Name "Pack" -ItemType Directory -Path "$Global:MyPackPath" -Force -Confirm:$false | Out-Null
@@ -1256,6 +1266,7 @@ Uninstall
                         }
                     }
                 }
+#>
             })
 			$MainForm.Add_FormClosing({
                 $t = 1
@@ -1777,7 +1788,7 @@ Uninstall
                                 LocalLogWrite "Clearing Imported File"
                                 LocalLogWrite "*---------------------------------*"
                                 $Global:MyFile = $null
-                                $Extension =$null
+                                $Extension = $null
                                 $Global:GroupFile_RunType = $null
                                 $Global:SessionImportedFile = $null
                                 $Global:GroupFile_Selected = $null
@@ -1910,26 +1921,45 @@ Uninstall
                     # check for data in text boxes that are checked
                     # run script
                     checkFiles
+                    #Write-Host "$Global:GroupFile_SelectedPath"
+                    #Test-Path "$Global:GroupFile_SelectedPath"
                     $PreReq_Script = $false
                     $PreReq_FileImported = $false
                     $PreReq_LoopCheck = $false
                     # PreReqs
-                    if ($Global:GroupFile_Selected -ne $null -and $Global:GroupFile_Selected -ne ""){
-                        if (Test-Path -Path "$Global:GroupFile_SelectedPath"){
-                            #LocalLogWrite "File Path is valid"
-                            $PreReq_FileImported = $true
-                        }else{
-                            [string]$GroupFile = $GroupFileSelection_Label.Text
-                            if (-not ($GroupFile -eq "<File Selected>")){
-                                LocalLogWrite "File Path is not valid '$Global:GroupFile_SelectedPath'"
-                                $PreReq_FileImported = $false
+
+                    # File Check
+                    #if ($Global:GroupFile_Selected -ne $null -and $Global:GroupFile_Selected -ne ""){
+                    if (-not ([string]::IsNullOrEmpty($Global:GroupFile_Selected))){
+                        if (-not ([string]::IsNullOrWhiteSpace($Global:GroupFile_Selected))){
+                            if ($Global:GroupFile_Selected -ne ""){
+                                if (Test-Path -Path "$Global:GroupFile_SelectedPath"){
+                                    #LocalLogWrite "File Path is valid"
+                                    $PreReq_FileImported = $true
+                                }else{
+                                    [string]$GroupFile = $GroupFileSelection_Label.Text
+                                    if (-not ($GroupFile -eq "<File Selected>")){
+                                        LocalLogWrite "File Path is not valid '$Global:GroupFile_SelectedPath'"
+                                        $PreReq_FileImported = $false
+                                    }else{
+                                        LocalLogWrite "No Imported File"
+                                        $PreReq_FileImported = $false
+                                    }
+                                }
                             }else{
-                                LocalLogWrite "No Imported File"
+                                LocalLogWrite "Script Path is empty"
                                 $PreReq_FileImported = $false
                             }
+                        }else{
+                            LocalLogWrite "Script Path is white space"
+                            $PreReq_FileImported = $false
                         }
-
+                    }else{
+                        LocalLogWrite "Script Path is null"
+                        $PreReq_FileImported = $false
                     }
+
+                    # Script Check
                     $GroupScript_Selected = $GroupFileScriptSelection_Combobox.SelectedItem
                     if (-not ([string]::IsNullOrEmpty($GroupScript_Selected))){
                         if (-not ([string]::IsNullOrWhiteSpace($GroupScript_Selected))){
@@ -1937,33 +1967,26 @@ Uninstall
                                 #LocalLogWrite "Script Path is valid"
                                 $PreReq_Script = $true
                             }else{
-                                LocalLogWrite "Script Path is empty '$Global:GroupFile_SelectedPath'"
-                                $PreReq_FileImported = $false
+                                LocalLogWrite "Script Path is empty"
+                                $PreReq_Script = $false
                             }
                         }else{
-                            [string]$GroupFile = $GroupFileSelection_Label.Text
-                            if (-not ($GroupFile -eq "<File Selected>")){
-                                LocalLogWrite "Script Path is not valid '$Global:GroupFile_SelectedPath'"
-                                $PreReq_FileImported = $false
-                            }else{
-                                LocalLogWrite "No Imported Script"
-                                $PreReq_FileImported = $false
-                            }
+                            LocalLogWrite "Script Path is white space"
+                            $PreReq_Script = $false
                         }
                     }else{
-                        [string]$GroupFile = $GroupFileSelection_Label.Text
-                        if (-not ($GroupFile -eq "<File Selected>")){
-                            LocalLogWrite "Path is not valid '$Global:GroupFile_SelectedPath'"
-                            $PreReq_FileImported = $false
-                        }else{
-                            LocalLogWrite "No Imported File"
-                            $PreReq_FileImported = $false
-                        }
+                        LocalLogWrite "Script Path is null"
+                        $PreReq_Script = $false
                     }
 
+
+                    # Loop Check
                     if ($GroupFileLoop_Checkbox.Checked){
                         $PreReq_LoopCheck = $true
                     }
+
+                    # PreReq Processing
+                    # -------------------------------------------
 
                     if ($PreReq_FileImported -eq $true){
                         if ($PreReq_Script -eq $true){
