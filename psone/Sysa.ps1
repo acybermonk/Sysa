@@ -2,10 +2,10 @@
 #
 #    Functionality    : *****  MAIN APP  *****
 #    -----------------------------------------
-#    Application Name : Sysa - Universal 1.2.7
+#    Application Name : Sysa - Universal 1.2.8
 #    Created by       : Daniel Krysty
 #    Date started     : September 2024
-#    Current as of    : October 2024
+#    Current as of    : January 2024
 #
 ##############################################
 ##############################################
@@ -14,7 +14,7 @@
 Param ([string] $FoundDrive)
 # App Variables (Updated)
 	$Global:AppName = "Sysa"
-	$Global:AppVer = "1.2.7"
+	$Global:AppVer = "1.2.8"
     $Global:Copyright = [System.Net.WebUtility]::HtmlDecode("&#169;")
     $Global:CpDate = "Oct. 2024"
 # Main Variables
@@ -35,7 +35,7 @@ Param ([string] $FoundDrive)
 		#$ProgressBar_Object = [System.Windows.Forms.ProgressBar]
 		#$Radio_Object = [System.Windows.Forms.RadioButton]
 # Log Session Data *temp data storage while using app* SAVE BEFORE EXITING unless Session auto-save is enabled there is 
-    $Global:ErrorCodeLogLocation =  "$Global:StartPath\Sysalogs\errorlogs\${Global:Date}_sysa.erlog"
+    $Global:ErrorCodeLogLocation =  "$Global:StartPath\Sysalogs\errorlogs\${Global:Date}-sysaERR.log"
     function utilErr{
         Param ([string]$LogString)
         Add-Content $Global:ErrorCodeLogLocation -Value $LogString
@@ -314,7 +314,7 @@ Uninstall
 		# Log Variables
             $Global:LogDate = Get-Date -Format "yyyy_MM"
 			$Global:SavedLogLocation = "$Global:StartPath\Sysalogs\savedlogs\${Global:LogDate}_sysa.log"
-            $Global:SessionLogLocation = "$Global:StartPath\Sysalogs\sessionlog\${Global:LogDate}_sysa_session.log"
+            $Global:SessionLogLocation = "$Global:StartPath\Sysalogs\sessionlog\${Global:LogDate}-SysaSession.log"
 			$Global:LogShow = $false
 		# ErrorCode Value
 			$Global:ErrorCodeVal = 0
@@ -1272,22 +1272,22 @@ Uninstall
                 $t = 1
 				# To turn on/off session Mode 
 				if ($Global:SessionMode){
-				    [string]$sessionPath = "$Global:StartPath\Sysalogs\sessionlog\${Global:LogDate}_sysa.slog"
-					if (Test-Path "Gloabal:StartPath\Sysalogs"){
+                    [string]$LogPath = $Global:SessionLogLocation					
+                    if (Test-Path "Gloabal:StartPath\Sysalogs"){
 						if (Test-Path "$Global:StartPath\Sysalogs\sessionlog"){
 							Add-Content -Path $sessionPath -Value $DisplayLog_RichTextBox.Text 
 						}else{
 							New-Item -Name "sessionlog" -ItemType Directory -Path "$Global:StartPath\Sysalogs" -Confirm:$false -Force
-							Add-Content -Path $sessionPath -Value $DisplayLog_RichTextBox.Text 
+							Add-Content -Path $LogPath -Value $DisplayLog_RichTextBox.Text 
 						}
 					}else{
 						New-Item -Name "Sysalogs" -ItemType Directory -Path "$Global:StartPath" -Confirm:$false -Force
 						New-Item -Name "sessionlog" -ItemType Directory -Path "$Global:StartPath\Sysalogs" -Confirm:$false -Force
-						Add-Content -Path $sessionPath -Value $DisplayLog_RichTextBox.Text 
+						Add-Content -Path $LogPath -Value $DisplayLog_RichTextBox.Text 
 					}
 				    $Global:FullDateTime = Get-Date -DisplayHint Date
 				    LocalLogWrite "Session Ended $Global:FullDateTime`n***********************************"
-                    LocalLogWrite "Session log saved at $sessionPath"
+                    LocalLogWrite "Session log saved at $LogPath"
                     $t = 3
 				}
 				$Global:FullDateTime = Get-Date -DisplayHint Date
