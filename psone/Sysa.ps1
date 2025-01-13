@@ -2,7 +2,7 @@
 #
 #    Functionality    : *****  MAIN APP  *****
 #    -----------------------------------------
-#    Application Name : Sysa - Universal 1.2.8
+#    Application Name : Sysa - Universal 1.2.9
 #    Created by       : Daniel Krysty
 #    Date started     : September 2024
 #    Current as of    : January 2024
@@ -14,7 +14,7 @@
 Param ([string] $FoundDrive)
 # App Variables (Updated)
 	$Global:AppName = "Sysa"
-	$Global:AppVer = "1.2.8"
+	$Global:AppVer = "1.2.9"
     $Global:Copyright = [System.Net.WebUtility]::HtmlDecode("&#169;")
     $Global:CpDate = "Oct. 2024"
 # Main Variables
@@ -1927,7 +1927,7 @@ Uninstall
                     $PreReq_FileImported = $false
                     $PreReq_LoopCheck = $false
                     # PreReqs
-
+                    LocalLogWrite "*-- Group Run Check --*"
                     # File Check
                     #if ($Global:GroupFile_Selected -ne $null -and $Global:GroupFile_Selected -ne ""){
                     if (-not ([string]::IsNullOrEmpty($Global:GroupFile_Selected))){
@@ -1947,15 +1947,15 @@ Uninstall
                                     }
                                 }
                             }else{
-                                LocalLogWrite "Script Path is empty"
+                                LocalLogWrite "File Path is empty"
                                 $PreReq_FileImported = $false
                             }
                         }else{
-                            LocalLogWrite "Script Path is white space"
+                            LocalLogWrite "File Path is white space"
                             $PreReq_FileImported = $false
                         }
                     }else{
-                        LocalLogWrite "Script Path is null"
+                        LocalLogWrite "File Path is null"
                         $PreReq_FileImported = $false
                     }
 
@@ -1978,16 +1978,23 @@ Uninstall
                         LocalLogWrite "Script Path is null"
                         $PreReq_Script = $false
                     }
-
+                    LocalLogWrite "*---------------------------------*" 
 
                     # Loop Check
                     if ($GroupFileLoop_Checkbox.Checked){
                         $PreReq_LoopCheck = $true
+                        LocalLogWrite "Loop: True"
+                        LocalLogWrite "*---------------------------------*`n"
+                        LocalLogWrite "*-- Looping Group Run --*"
+                    }else{
+                        $PreReq_LoopCheck = $false
+                        LocalLogWrite "Loop: False"
+                        LocalLogWrite "*---------------------------------*`n"
+                        LocalLogWrite "*-- Group Run --*"
                     }
 
                     # PreReq Processing
                     # -------------------------------------------
-
                     if ($PreReq_FileImported -eq $true){
                         if ($PreReq_Script -eq $true){
                             # Pass PreReq
@@ -2009,13 +2016,12 @@ Uninstall
                                 LocalLogWrite "*---------------------------------*"
                             }
                         }else{
-                            LocalLogWrite "ERR: No GroupFile Script Imported(1)"
+                            LocalLogWrite "ERR: No Group Script Imported"
                             LocalLogWrite "*---------------------------------*"
                         }
                     }else{
-                        LocalLogWrite "ERR: No GroupFile Imported"
                         if (-not ($PreReq_Script -eq $true)){
-                            LocalLogWrite "ERR: No GroupFile Script Imported(2)"
+                            LocalLogWrite "ERR: No Group File Imported"
                         }
                         LocalLogWrite "*---------------------------------*"
                     }
