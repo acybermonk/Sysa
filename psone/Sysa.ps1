@@ -2,7 +2,7 @@
 #
 #    Functionality    : *****  MAIN APP  *****
 #    -----------------------------------------
-#    Application Name : Sysa - Universal 1.2.9
+#    Application Name : Sysa - Universal 1.2.10
 #    Created by       : Daniel Krysty
 #    Date started     : September 2024
 #    Current as of    : January 2024
@@ -14,7 +14,7 @@
 Param ([string] $FoundDrive)
 # App Variables (Updated)
 	$Global:AppName = "Sysa"
-	$Global:AppVer = "1.2.9"
+	$Global:AppVer = "1.2.10"
     $Global:Copyright = [System.Net.WebUtility]::HtmlDecode("&#169;")
     $Global:CpDate = "Oct. 2024"
 # Main Variables
